@@ -1,0 +1,2 @@
+# goDemo
+sample of go
