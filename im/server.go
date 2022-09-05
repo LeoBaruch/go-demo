@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"sync"
 )
@@ -49,7 +50,6 @@ func (this *Server) BroadCast(user *User, msg string) {
 }
 
 func (this *Server) Handler(connect net.Conn) {
-	fmt.Println("一上线")
 	user := NewUser(connect)
 
 	this.mapLock.Lock()
@@ -57,6 +57,31 @@ func (this *Server) Handler(connect net.Conn) {
 	this.mapLock.Unlock()
 
 	this.BroadCast(user, "已上线")
+
+	go func() {
+		buf := make([]byte, 4096)
+
+		for {
+			n, err := connect.Read(buf)
+
+			if n == 0 {
+				this.BroadCast(user, "下限")
+
+				return
+			}
+
+			if err != nil && err != io.EOF {
+				fmt.Println("connect read err: ", err)
+
+				return
+			}
+
+			// 提取用户消息(去掉\n)
+			msg := string(buf[:n-1])
+
+			this.BroadCast(user, msg)
+		}
+	}()
 
 	// 阻塞当前goroutine
 	select {}
@@ -84,6 +109,7 @@ func (this *Server) Start() {
 
 			continue
 		}
+
 		go this.Handler(connect)
 
 	}
