@@ -9,9 +9,11 @@ type User struct {
 	Addr string
 	C    chan string
 	conn net.Conn
+
+	server *Server
 }
 
-func NewUser(conn net.Conn) *User {
+func NewUser(conn net.Conn, server *Server) *User {
 	userAddr := conn.RemoteAddr().String()
 
 	user := &User{
@@ -19,11 +21,33 @@ func NewUser(conn net.Conn) *User {
 		Addr: userAddr,
 		C:    make(chan string),
 		conn: conn,
+
+		server: server,
 	}
 
 	go user.ListenMessage()
 
 	return user
+}
+
+func (this *User) Online() {
+	this.server.mapLock.Lock()
+	this.server.OnlineMap[this.Name] = this
+	this.server.mapLock.Unlock()
+
+	this.server.BroadCast(this, "已上线")
+}
+
+func (this *User) Offline() {
+	this.server.mapLock.Lock()
+	delete(this.server.OnlineMap, this.Name)
+	this.server.mapLock.Unlock()
+
+	this.server.BroadCast(this, "下线")
+}
+
+func (this *User) DoMessage(msg string) {
+	this.server.BroadCast(this, msg)
 }
 
 func (this *User) ListenMessage() {
