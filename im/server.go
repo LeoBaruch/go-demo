@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 )
 
 type Server struct {
@@ -55,6 +56,8 @@ func (this *Server) Handler(connect net.Conn) {
 	// 用户上线
 	user.Online()
 
+	isLive := make(chan bool)
+
 	go func() {
 		buf := make([]byte, 4096)
 
@@ -77,11 +80,24 @@ func (this *Server) Handler(connect net.Conn) {
 			msg := string(buf[:n-1])
 
 			user.DoMessage(msg)
+
+			// 刷新用户活跃状态
+			isLive <- true
 		}
 	}()
 
-	// 阻塞当前goroutine
-	select {}
+	for {
+		select {
+		case <-isLive:
+
+		case <-time.After(time.Second * 10):
+			user.SendMsg("超时被踢!")
+			close(user.C)
+			connect.Close()
+
+			return
+		}
+	}
 }
 
 func (this *Server) Start() {
