@@ -78,6 +78,33 @@ func (this *User) DoMessage(msg string) {
 			this.Name = newName
 			this.SendMsg("您已经更新新用户名: " + this.Name + "\n")
 		}
+
+		// 添加私聊功能
+	} else if strings.HasPrefix(msg, "to|") && len(msg) > 4 {
+		remoteName := strings.Split(msg, "|")[1]
+		tips := "请使用形如\"to|张三|你好啊!\"的格式"
+
+		if remoteName == "" {
+			this.SendMsg("消息格式不正确," + tips + "\n")
+			return
+		}
+
+		remoteUser, ok := this.server.OnlineMap[remoteName]
+
+		if !ok {
+			this.SendMsg("当前用户不存在!")
+			return
+		}
+
+		content := strings.Split(msg, "|")[2]
+
+		if content == "" {
+			this.SendMsg("消息为空," + tips + "\n")
+			return
+		}
+
+		remoteUser.SendMsg(this.Name + "对您说:" + content + "\n")
+
 	} else {
 		this.server.BroadCast(this, msg)
 	}

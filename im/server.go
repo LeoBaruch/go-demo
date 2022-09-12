@@ -89,8 +89,8 @@ func (this *Server) Handler(connect net.Conn) {
 	for {
 		select {
 		case <-isLive:
-
-		case <-time.After(time.Second * 10):
+		// 3分钟不说话强踢
+		case <-time.After(time.Second * 60 * 3):
 			user.SendMsg("超时被踢!")
 			close(user.C)
 			connect.Close()
