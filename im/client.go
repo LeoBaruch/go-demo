@@ -90,6 +90,36 @@ func (this *Client) PublicChat() {
 	}
 }
 
+func (this *Client) SelectUser() {
+	sendMsg := "who\n"
+
+	_, err := this.conn.Write([]byte(sendMsg))
+
+	if err != nil {
+		fmt.Println("conn err: ", err)
+	}
+}
+
+func (this *Client) PriviteChat() {
+	this.SelectUser()
+	var chatMsg string
+
+	var userName string
+	fmt.Println("请输入私聊用户名:")
+	fmt.Scanln(&userName)
+
+	fmt.Println("请输入私聊内容:")
+	fmt.Scanln(&chatMsg)
+
+	for chatMsg != "exit" {
+		sendMsg := "to|" + userName + "|" + chatMsg + "\n"
+		this.conn.Write([]byte(sendMsg))
+
+		fmt.Println("请输入私聊内容:")
+		fmt.Scanln(&chatMsg)
+	}
+}
+
 func (this *Client) Run() {
 	for this.flag != 0 {
 		for this.Menu() != true {
@@ -100,7 +130,7 @@ func (this *Client) Run() {
 			this.PublicChat()
 			break
 		case 2:
-			fmt.Println("公聊模式选择...")
+			this.PriviteChat()
 			break
 		case 3:
 			this.UpdateName()
