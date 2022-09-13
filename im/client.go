@@ -76,6 +76,20 @@ func (this *Client) UpdateName() bool {
 	return true
 }
 
+func (this *Client) PublicChat() {
+	var chatMsg string
+	fmt.Println("请输入公聊内容:")
+	fmt.Scanln(&chatMsg)
+
+	for chatMsg != "exit" {
+		sendMsg := chatMsg + "\n"
+		this.conn.Write([]byte(sendMsg))
+
+		fmt.Println("请输入公聊内容:")
+		fmt.Scanln(&chatMsg)
+	}
+}
+
 func (this *Client) Run() {
 	for this.flag != 0 {
 		for this.Menu() != true {
@@ -83,7 +97,7 @@ func (this *Client) Run() {
 
 		switch this.flag {
 		case 1:
-			fmt.Println("公聊模式选择...")
+			this.PublicChat()
 			break
 		case 2:
 			fmt.Println("公聊模式选择...")
