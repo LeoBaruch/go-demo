@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"net/http"
 	"transpotation/config"
+	c "transpotation/server/controller"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,7 @@ func Run() {
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.Writer.Write([]byte("hi!"))
 	})
+	r.POST("/api/v1/texts", c.TextsController)
 
 	r.StaticFS("/static", http.FS(staticFiles))
 

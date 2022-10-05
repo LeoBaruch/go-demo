@@ -11,6 +11,9 @@ export function Home() {
       <Header>同步传</Header>
       {nav}
       <Switch>
+        <Route exact path="/">
+          <UploadTextForm />
+        </Route>
         <Route exact path="/message">
           <UploadTextForm />
         </Route>

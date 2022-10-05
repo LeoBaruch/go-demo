@@ -54,7 +54,7 @@ const Main = () => {
     <AppContext.Provider value={context}>
       <Router history={history}>
         <Switch>
-          <Redirect exact from="/" to="/message" />
+          {/* <Redirect exact from="/" to="/message" /> */}
           <Route exact path="/downloads">
             <Downloads />
           </Route>
