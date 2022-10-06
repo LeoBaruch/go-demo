@@ -4,8 +4,8 @@ import (
 	"embed"
 	"io/fs"
 	"net/http"
-	"transpotation/config"
-	c "transpotation/server/controller"
+	"transportation/config"
+	c "transportation/server/controller"
 
 	"github.com/gin-gonic/gin"
 )

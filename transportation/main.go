@@ -3,8 +3,8 @@ package main
 import (
 	"embed"
 	"log"
-	"transpotation/config"
-	"transpotation/server"
+	"transportation/config"
+	"transportation/server"
 
 	"github.com/zserge/lorca"
 )
