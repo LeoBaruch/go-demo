@@ -20,6 +20,7 @@ func Run() {
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.Writer.Write([]byte("hi!"))
 	})
+	r.GET("/api/v1/addresses", c.AddressesController)
 	r.POST("/api/v1/texts", c.TextsController)
 
 	r.StaticFS("/static", http.FS(staticFiles))
