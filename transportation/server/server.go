@@ -16,12 +16,11 @@ var FS embed.FS
 func Run() {
 	staticFiles, _ := fs.Sub(FS, "frontend/dist")
 
+	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.Writer.Write([]byte("hi!"))
-	})
 	r.GET("/api/v1/addresses", c.AddressesController)
 	r.POST("/api/v1/texts", c.TextsController)
+	r.GET("/uploads/:path", c.UploadsController)
 
 	r.StaticFS("/static", http.FS(staticFiles))
 
