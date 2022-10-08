@@ -21,6 +21,7 @@ func Run() {
 	r.GET("/api/v1/addresses", c.AddressesController)
 	r.POST("/api/v1/texts", c.TextsController)
 	r.GET("/uploads/:path", c.UploadsController)
+	r.GET("/api/v1/qrcodes", c.QrcodesController)
 
 	r.StaticFS("/static", http.FS(staticFiles))
 
