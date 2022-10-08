@@ -22,8 +22,9 @@ func Run() {
 	r.POST("/api/v1/texts", c.TextsController)
 	r.GET("/uploads/:path", c.UploadsController)
 	r.GET("/api/v1/qrcodes", c.QrcodesController)
+	r.POST("/api/v1/files", c.FilesController)
 
 	r.StaticFS("/static", http.FS(staticFiles))
 
-	r.Run(":" + config.Port)
+	r.Run("0.0.0.0:" + config.Port)
 }

@@ -20,6 +20,5 @@ func QrcodesController(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
 	c.Data(http.StatusOK, "image/png", png)
 }
