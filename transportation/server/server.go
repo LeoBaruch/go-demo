@@ -3,7 +3,9 @@ package server
 import (
 	"embed"
 	"io/fs"
+	"log"
 	"net/http"
+	"strings"
 	"transportation/config"
 	c "transportation/server/controller"
 
@@ -25,6 +27,26 @@ func Run() {
 	r.POST("/api/v1/files", c.FilesController)
 
 	r.StaticFS("/static", http.FS(staticFiles))
+
+	r.NoRoute(func(c *gin.Context) {
+		path := c.Request.URL.Path
+		if strings.HasPrefix(path, "/static") {
+			file, err := staticFiles.Open("index.html")
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+			defer file.Close()
+
+			stat, err := file.Stat()
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+
+			c.DataFromReader(http.StatusOK, stat.Size(), "text/html;charset=utf-8", file, nil)
+		} else {
+			c.Status(http.StatusNotFound)
+		}
+	})
 
 	r.Run("0.0.0.0:" + config.Port)
 }
