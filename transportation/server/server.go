@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"transportation/config"
 	c "transportation/server/controller"
+	"transportation/server/ws"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,8 @@ var FS embed.FS
 
 func Run() {
 	staticFiles, _ := fs.Sub(FS, "frontend/dist")
+	hub := ws.NewHub()
+	go hub.Run()
 
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
@@ -23,6 +26,10 @@ func Run() {
 	r.GET("/uploads/:path", c.UploadsController)
 	r.GET("/api/v1/qrcodes", c.QrcodesController)
 	r.POST("/api/v1/files", c.FilesController)
+
+	r.GET("/ws", func(ctx *gin.Context) {
+		ws.HttpController(ctx, hub)
+	})
 
 	r.StaticFS("/static", http.FS(staticFiles))
 
