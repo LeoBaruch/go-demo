@@ -3,11 +3,10 @@ package server
 import (
 	"embed"
 	"io/fs"
-	"log"
 	"net/http"
-	"strings"
 	"transportation/config"
 	c "transportation/server/controller"
+	"transportation/server/ws"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +16,8 @@ var FS embed.FS
 
 func Run() {
 	staticFiles, _ := fs.Sub(FS, "frontend/dist")
+	hub := ws.NewHub()
+	go hub.Run()
 
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
@@ -26,26 +27,14 @@ func Run() {
 	r.GET("/api/v1/qrcodes", c.QrcodesController)
 	r.POST("/api/v1/files", c.FilesController)
 
+	r.GET("/ws", func(ctx *gin.Context) {
+		ws.HttpController(ctx, hub)
+	})
+
 	r.StaticFS("/static", http.FS(staticFiles))
 
-	r.NoRoute(func(c *gin.Context) {
-		path := c.Request.URL.Path
-		if strings.HasPrefix(path, "/static") {
-			file, err := staticFiles.Open("index.html")
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-			defer file.Close()
-
-			stat, err := file.Stat()
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-
-			c.DataFromReader(http.StatusOK, stat.Size(), "text/html;charset=utf-8", file, nil)
-		} else {
-			c.Status(http.StatusNotFound)
-		}
+	r.NoRoute(func(ctx *gin.Context) {
+		c.NoRoute(ctx, staticFiles)
 	})
 
 	r.Run("0.0.0.0:" + config.Port)
