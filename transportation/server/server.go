@@ -18,7 +18,7 @@ var FS embed.FS
 func Run() {
 	staticFiles, _ := fs.Sub(FS, "frontend/dist")
 
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.GET("/api/v1/addresses", c.AddressesController)
 	r.POST("/api/v1/texts", c.TextsController)
